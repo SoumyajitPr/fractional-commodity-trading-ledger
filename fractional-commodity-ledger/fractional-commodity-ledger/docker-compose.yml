@@ -1,0 +1,35 @@
+# docker compose up --build        -> PostgreSQL + the application on http://localhost:8080
+# docker compose up -d postgres    -> only PostgreSQL (then run the app from your IDE / mvn)
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: commodity-ledger-db
+    environment:
+      POSTGRES_DB: commodity_ledger
+      POSTGRES_USER: ledger
+      POSTGRES_PASSWORD: ledger
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledger -d commodity_ledger"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    container_name: commodity-ledger-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/commodity_ledger
+      DB_USERNAME: ledger
+      DB_PASSWORD: ledger
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+volumes:
+  pgdata:

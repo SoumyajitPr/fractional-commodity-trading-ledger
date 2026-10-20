@@ -1,0 +1,67 @@
+### Fractional Commodity Ledger — runnable from IntelliJ IDEA (HTTP Client) or VS Code (REST Client).
+### Run them top to bottom. After "Create user", set @userId to the returned id.
+
+@baseUrl = http://localhost:8080
+@userId = 1
+
+### List commodities
+GET {{baseUrl}}/api/commodities
+Authorization: Basic trader trader123
+
+### Create user
+POST {{baseUrl}}/api/users
+Authorization: Basic trader trader123
+Content-Type: application/json
+
+{ "name": "Reeck Demo", "email": "reeck.demo@example.com" }
+
+### Deposit INR 10,000
+POST {{baseUrl}}/api/users/{{userId}}/wallet/deposit
+Authorization: Basic trader trader123
+Content-Type: application/json
+
+{ "amount": 10000 }
+
+### Buy INR 2,000 of GOLD (wallet 10,000 -> 8,000)
+POST {{baseUrl}}/api/trades/buy
+Authorization: Basic trader trader123
+Content-Type: application/json
+
+{ "userId": {{userId}}, "commodity": "GOLD", "amount": 2000 }
+
+### Buy 0.5 g of SILVER with an idempotency key (send twice: second reply has "replayed": true)
+POST {{baseUrl}}/api/trades/buy
+Authorization: Basic trader trader123
+Content-Type: application/json
+
+{ "userId": {{userId}}, "commodity": "SILVER", "quantity": 0.5, "clientOrderId": "silver-order-001" }
+
+### Portfolio
+GET {{baseUrl}}/api/users/{{userId}}/portfolio
+Authorization: Basic trader trader123
+
+### ADMIN: change GOLD price
+PUT {{baseUrl}}/api/commodities/GOLD/price
+Authorization: Basic admin admin123
+Content-Type: application/json
+
+{ "pricePerUnit": 13000 }
+
+### Sell INR 1,040 of GOLD
+POST {{baseUrl}}/api/trades/sell
+Authorization: Basic trader trader123
+Content-Type: application/json
+
+{ "userId": {{userId}}, "commodity": "GOLD", "amount": 1040 }
+
+### Trade history
+GET {{baseUrl}}/api/users/{{userId}}/trades
+Authorization: Basic trader trader123
+
+### Ledger history of the user
+GET {{baseUrl}}/api/users/{{userId}}/ledger
+Authorization: Basic trader trader123
+
+### ADMIN: verify ledger integrity
+GET {{baseUrl}}/api/ledger/verify
+Authorization: Basic admin admin123

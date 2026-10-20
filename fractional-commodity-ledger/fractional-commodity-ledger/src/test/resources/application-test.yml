@@ -1,0 +1,12 @@
+# Tests run against H2 in PostgreSQL compatibility mode, using the same Flyway
+# migrations as production, so `mvn test` needs neither Docker nor PostgreSQL.
+spring:
+  datasource:
+    url: jdbc:h2:mem:ledgertest;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;LOCK_TIMEOUT=10000;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+
+logging:
+  level:
+    com.commodityledger: WARN

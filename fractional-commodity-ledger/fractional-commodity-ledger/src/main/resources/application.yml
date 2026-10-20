@@ -1,0 +1,53 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: fractional-commodity-ledger
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/commodity_ledger}
+    username: ${DB_USERNAME:ledger}
+    password: ${DB_PASSWORD:ledger}
+
+  jpa:
+    # Flyway owns the schema; Hibernate never creates or alters tables.
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    # Common migrations + database-specific ones (e.g. the PostgreSQL append-only ledger trigger).
+    locations: classpath:db/migration,classpath:db/vendor/{vendor}
+
+  jackson:
+    generator:
+      write-bigdecimal-as-plain: true
+
+app:
+  security:
+    trader:
+      username: ${TRADER_USERNAME:trader}
+      password: ${TRADER_PASSWORD:trader123}
+    admin:
+      username: ${ADMIN_USERNAME:admin}
+      password: ${ADMIN_PASSWORD:admin123}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.commodityledger: INFO
